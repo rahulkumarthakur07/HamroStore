@@ -157,7 +157,7 @@ This project is licensed under the MIT License – see the LICENSE
 
 👨‍💻 Author
 
-Rahul Kumar Thakur
+Rahul Kumar Thakur barahi
 
 🔗 GitHub
 
