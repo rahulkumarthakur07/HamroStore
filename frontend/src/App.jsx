@@ -1,8 +1,20 @@
 import React from 'react'
+import {Outlet} from 'react-router-dom'
+import Navigation from './pages/Auth/Navigation'
+import {ToastContainer} from "react-toastify"
+import 'react-toastify/ReactToastify.css'
 
 const App = () => {
   return (
-    <div className='flex bg-amber-600 w-full h-screen' >Hello</div>
+    <>
+    <ToastContainer/>
+      <Navigation/>
+      <main className="py-3">
+        <Outlet/>
+      </main>
+    
+    </>
+
   )
 }
 
