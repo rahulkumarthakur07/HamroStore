@@ -2,6 +2,7 @@ import User from "../models/userModel.js";
 import asyncHandler from "../middlewares/asyncHandler.js";
 import bcrypt from "bcryptjs";
 import generateToken from "../utils/createToken.js";
+import { json } from "express";
 
 // Use named export to match your router import
 export const createUser = asyncHandler(async (req, res) => {
@@ -74,14 +75,68 @@ export const logoutUser = asyncHandler(async (req, res) => {
   res.status(200).json({ message: "Logged out Successfully" });
 });
 
-export const getAllUsers = asyncHandler(async(req,res)=>{
-
+export const getAllUsers = asyncHandler(async (req, res) => {
   try {
-    const users =  await User.find({})
-    res.json(users)
+    const users = await User.find({});
+    res.json(users);
   } catch (error) {
-    res.status(401)
-    throw new Error("user not forund")
+    res.status(401);
+    throw new Error("user not forund");
   }
+});
 
-})
+export const getcurrentUserProfile = asyncHandler(async (req, res) => {
+  const user = await User.findById(req.user._id);
+
+  if (user) {
+    res.json({
+      _id: user.id,
+      username: user.username,
+      email: user.email,
+    });
+  } else {
+    res.status(404);
+    throw new Error("User not found.");
+  }
+});
+
+  export const updateCurrentUserProfile = asyncHandler(async (req, res) => {
+    const user = await User.findById(req.user._id);
+
+    if (user) {
+      user.username = req.body.username || user.username;
+      user.email = req.body.email || user.email;
+      if (req.body.password) {
+        const salt = await bcrypt.genSalt(10);
+        const hashedPassword = await bcrypt.hash(req.body.password, salt);
+        user.password = hashedPassword || user.password;
+      }
+
+      const updatedUser = await user.save();
+
+      return res.json({
+        _id: updatedUser._id,
+        username: updatedUser.username,
+        email: updatedUser.email,
+        isAdmin: updatedUser.isAdmin,
+      });
+    }
+    res.status(404);
+    throw new Error("User not found");
+  });
+
+  export const deleteUserById = asyncHandler( async (req , res)=>{
+    const user = await User.findById(req.params.id)
+    if (user) {
+      if (user.isAdmin) {
+      res.status(400)
+      throw new Error("Cannot delete admin User")
+    }
+    await User.deleteOne({_id:user._id})
+    res.json({message:"user removed"})
+    }else{
+      res.status(404)
+      throw new Error("User not found");
+      
+    }
+  })

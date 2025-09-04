@@ -9,7 +9,7 @@ const authenticate = asyncHandler(async (req, res, next) => {
     try {
       const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
-      req.user = await User.findById(decoded.userId).select("-password"); // ✅ use findById
+      req.user = await User.findById(decoded.userId).select("-password");
 
       return next();
     } catch (error) {
